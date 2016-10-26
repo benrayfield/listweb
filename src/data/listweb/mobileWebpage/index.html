@@ -1,0 +1,293 @@
+<!DOCTYPE html><html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<script>
+var time = function(){
+	return Date.now()*.001;
+};
+var lg = function(line){
+	console.log(line);
+};
+var gbid = function(id){
+	return document.getElementById(id);
+};
+var sizeOfMap = function(map){
+	var size = 0;
+	for(i in map) size++;
+	return size;
+};
+var listToString = function(list, isUp){
+	if(isUp){
+		list = list.slice(); //copy
+		list.reverse();
+	}
+	var s = '';
+	for(var i=0; i<list.length; i++){
+		if(i != 0) s += "\r\n<br>";
+		s += list[i];
+	}
+	return s;
+};
+
+var escapeAndQuote = function(s){
+	return "'"+escape(s)+"'";
+};
+
+var prilistToStringWithLinks = function(list, stackName, isUp){
+	if(isUp){
+		list = list.slice(); //copy
+		list.reverse();
+	}
+	var s = '';
+	for(var i=0; i<list.length; i++){
+		if(i != 0) s += "\r\n<br>";
+		var name = list[i];
+		//s += list[i];
+		s += '<a onclick="javascript:onClickInPrilistOfStack(unescape('+escapeAndQuote(name)+'), unescape('+escapeAndQuote(stackName)+'));">'+escapeHtml(name)+'</a>';
+	}
+	return s;
+};
+
+var escapeHtml = function(s){
+	return s.replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;")
+};
+
+var rootName = "prilistPrilist";
+var nameOfStackUp = 'defaultJsPrilistStackUp';
+var nameOfStackDown = 'defaultJsPrilistStackDown';
+//map of string to same map as on server. Keys of each value include prilist and def.
+var mindmap = {};
+mindmap[nameOfStackUp] = {time:0, prilist:[rootName, nameOfStackUp], def:"", selectedName:rootName};
+mindmap[nameOfStackDown] = {time:0, prilist:[rootName, nameOfStackDown], def:"", selectedName:rootName};
+mindmap[rootName] = {time:0, prilist:[rootName, nameOfStackUp, nameOfStackDown], def:""};
+
+var selectNextHigherInStack = function(stackName){
+	var index = mindmap[stackName].prilist.indexOf(mindmap[stackName].selectedName);
+	if(index < mindmap[stackName].prilist.length-1){
+		mindmap[stackName].selectedName = mindmap[stackName].prilist[index+1];
+		refresh();
+	}
+};
+
+var selectNextLowerInStack = function(stackName){
+	var index = mindmap[stackName].prilist.indexOf(mindmap[stackName].selectedName);
+	if(0 < index){
+		mindmap[stackName].selectedName = mindmap[stackName].prilist[index-1];
+		refresh();
+	}
+};
+
+var onClickInPrilistOfStack = function(nameClickedInPrilist, stackName){
+	//alert(nameClickedInPrilist);
+	var stack = mindmap[stackName].prilist;
+	var indexInStack = stack.indexOf(nameClickedInPrilist);
+	if(indexInStack == -1){
+		var selectedIndexInStack = stack.indexOf(mindmap[stackName].selectedName);
+		while(selectedIndexInStack < stack.length-1) stack.pop();
+		stack.push(nameClickedInPrilist);
+	}
+	mindmap[stackName].selectedName = nameClickedInPrilist;
+	refresh();
+};
+
+var ajaxCallsInProgress = 0;
+
+var ajaxSendGet = function(stringSendToServer){
+	ajaxCallsInProgress++;
+	try{
+		var jax = 'no ajax object created';
+		if(window.XMLHttpRequest){ 
+			jax = new window.XMLHttpRequest();
+		}else if(window.ActiveXObject){
+			jax = new window.ActiveXObject('Microsoft.XMLHTTP');
+		}
+		//jax.open('POST', 'http://'+window.location.host+'/mindmapAjax', true);
+		//jax.open('POST', '/mindmapAjax', true);
+		//jax.open('GET', '/mindmapAjax', true);
+		jax.open('GET', 'http://'+window.location.host+'/'+stringSendToServer, true);
+		jax.onreadystatechange = function(){
+			console.log('readyState '+jax.readyState);
+			for(i in jax){
+				console.log('time='+time()+' received jax['+i+']='+jax[i]);
+			}
+			//console.log('getResponseHeader content = '+jax.getResponseHeader('Content'));
+			//gbid('ajaxTestDiv').innerText = ''+jax;
+			if(jax.readyState == 4){
+				ajaxReceive(stringSendToServer, jax.responseText);
+			}
+		};
+		//jax.setRequestHeader('Content-type', 'text/html');
+		//jax.setRequestHeader('Connection', 'close');
+		//jax.setRequestHeader('content', stringSendToServer);
+		//jax.send(stringSendToServer);
+		lg('Saying to server: '+stringSendToServer);
+		//stringSendToServer = escape(stringSendToServer);
+		//lg('Saying encoded to server: '+stringSendToServer);
+		//jax.send(stringSendToServer);
+		jax.send(null);
+	}catch(e){
+		alert(e);
+	}
+};
+
+var ajaxSendPost = function(stringSendToServer){
+	ajaxCallsInProgress++;
+	try{
+		var jax = 'no ajax object created';
+		if(window.XMLHttpRequest){ 
+			jax = new window.XMLHttpRequest();
+		}else if(window.ActiveXObject){
+			jax = new window.ActiveXObject('Microsoft.XMLHTTP');
+		}
+		//jax.open('POST', 'http://'+window.location.host+'/mindmapAjax', true);
+		//jax.open('POST', '/mindmapAjax', true);
+		//jax.open('GET', '/mindmapAjax', true);
+		jax.open('POST', 'http://'+window.location.host+'/mindmapAjax', true);
+		jax.onreadystatechange = function(){
+			console.log('readyState '+jax.readyState);
+			for(i in jax){
+				console.log('time='+time()+' received jax['+i+']='+jax[i]);
+			}
+			//console.log('getResponseHeader content = '+jax.getResponseHeader('Content'));
+			//gbid('ajaxTestDiv').innerText = ''+jax;
+			if(jax.readyState == 4){
+				ajaxReceive(stringSendToServer, jax.responseText);
+			}
+		};
+		jax.setRequestHeader('Content-type', 'text/html');
+		//jax.setRequestHeader('Connection', 'close');
+		//jax.setRequestHeader('content', stringSendToServer);
+		//jax.send(stringSendToServer);
+		lg('Saying to server: '+stringSendToServer);
+		//stringSendToServer = escape(stringSendToServer);
+		//lg('Saying encoded to server: '+stringSendToServer);
+		jax.send(stringSendToServer);
+	}catch(e){
+		alert(e);
+	}
+};
+
+var ajaxReceive = function(stringSentToServer, stringReceivedFromServer){
+	//gbid('ajaxTestDiv').innerText = stringReceivedFromServer;
+	lastAjaxFinishedWhen = time();
+	ajaxCallsInProgress--;
+	//FIXME check uiTime make sure its later than local uiTime for that name
+	mindmap[stringSentToServer] = JSON.parse(stringReceivedFromServer);
+	refresh();
+};
+
+/*
+var createMapToSendToServer = function(){
+	var map = {};
+	map[nameOfStackUp] = mindmap[nameOfStackUp];
+	map[nameOfStackDown] = mindmap[nameOfStackDown];
+	if(mindmap[nameOfStackUp].selectedName !== undefined){
+		if(mindmap[nameOfStackUp.selectedName] !== undefined){
+			map[nameOfStackUp.selectedName] = mindmap[nameOfStackUp.selectedName];
+		}
+	}
+	if(mindmap[nameOfStackDown].selectedName !== undefined){
+		if(mindmap[nameOfStackDown.selectedName] !== undefined){
+			map[nameOfStackDown.selectedName] = mindmap[nameOfStackDown.selectedName];
+		}
+	}
+	return map;
+};
+
+var sendNextAjax = function(){
+	var map = createMapToSendToServer();
+	var json = JSON.stringify(map, null, "\t");
+	ajaxSend(json);
+};*/
+
+var refresh = function(){
+	var upSelected = mindmap[nameOfStackUp].selectedName;
+	var downSelected = mindmap[nameOfStackDown].selectedName;
+	var upSelectedIndex = mindmap[nameOfStackUp].prilist.indexOf(upSelected);
+	var downSelectedIndex = mindmap[nameOfStackDown].prilist.indexOf(downSelected);
+	
+	gbid('upStackGhost').innerHTML = listToString(mindmap[nameOfStackUp].prilist.slice(upSelectedIndex+1), true);
+	gbid('upStackSelected').innerHTML = listToString(mindmap[nameOfStackUp].prilist.slice(upSelectedIndex,upSelectedIndex+1), true);
+	gbid('upStackPath').innerHTML = listToString(mindmap[nameOfStackUp].prilist.slice(0,upSelectedIndex), true);
+	
+	gbid('downStackPath').innerHTML = listToString(mindmap[nameOfStackDown].prilist.slice(0,downSelectedIndex), false);
+	gbid('downStackSelected').innerHTML = listToString(mindmap[nameOfStackDown].prilist.slice(downSelectedIndex,downSelectedIndex+1), false);
+	gbid('downStackGhost').innerHTML = listToString(mindmap[nameOfStackDown].prilist.slice(downSelectedIndex+1), false);
+	
+	if(mindmap[upSelected] === undefined){ //havent downloaded that name so schedule it
+		ajaxSendGet(mindmap[nameOfStackUp].selectedName);
+	}else{ //display name's prilist thats selected in stack
+		gbid('upPrilist').innerHTML = prilistToStringWithLinks(mindmap[upSelected].prilist, nameOfStackUp, true);
+	}
+	if(mindmap[downSelected] === undefined){ //havent downloaded that name so schedule it
+		ajaxSendGet(mindmap[nameOfStackDown].selectedName);
+	}else{ //display name's prilist thats selected in stack
+		gbid('downPrilist').innerHTML = prilistToStringWithLinks(mindmap[downSelected].prilist, nameOfStackDown, false);
+	}
+	var width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+	var height = (window.innerHeight > 0) ? window.innerHeight : screen.height;
+	setWidths(width*.8);
+	var midStuffHeight = gbid('tdStackUp').offsetHeight + gbid('tdText').offsetHeight + gbid('tdStackDown').offsetHeight + gbid('tdDef').offsetHeight;
+	var heightRemainForPrilists = height-midStuffHeight;
+	heightRemainForPrilists *= .92; //FIXME
+	//var setEachPrilistHeight = heightRemainForPrilists/2;
+	//alert('setEachPrilistHeight='+setEachPrilistHeight);
+	gbid('upPrilist').style.height = Math.round(heightRemainForPrilists*.45)+'px';
+	gbid('downPrilist').style.height = Math.round(heightRemainForPrilists*.55)+'px';
+	
+	gbid('upPrilist').scrollTop = gbid('upPrilist').scrollHeight; //scroll to bottom. FIXME this should remember scroll like java version
+};
+
+var setWidths = function(w){
+	var wPx = Math.round(w)+'px';
+	var ids = ['upPrilist', 'upMid', 'upStackGhost', 'upStackSelected', 'upStackPath', 'downStackPath', 'downStackSelected', 'downStackGhost', 'downMid', 'downPrilist'];
+	for(i in ids){
+		gbid(ids[i]).style.width = wPx;
+	}
+};
+
+window.onload = function(){
+	ajaxSendGet('prilistPrilist');
+};
+
+</script>
+</head>
+<body><table width=100% cellpadding=0 cellspacing=0 border=0>
+<tr id="tdDef"><td colspan=2>
+	<textarea width=100% id="theTextarea" rows=3 style="width:100%">def goes here</textarea>
+</td></tr><tr id="tdPrilistUp"><td>
+		<div id='upPrilist' style="background-color:#ffffff;overflow-y:scroll;height:150px;width:100px">..upPrilist..</div>
+	</td><td>
+		<input type=button value="/\">
+		<br><input type=button value="/\">
+		<br><input type=button value="\/">
+		<br><input type=button value="\/">
+</td></tr><tr id="tdStackUp"><td>
+		<div id='upMid' style="background-color:#00dd88">..upMid..</div>
+		<div id='upStackGhost' style="background-color:#336688">..upStackGhost..</div>
+		<div id='upStackSelected' style="background-color:#00aaee">..upStackSelected..</div>
+		<div id='upStackPath' style="background-color:#4488aa">..upStackPath..</div>
+	</td><td>
+		<input type=button value="/\" onclick="selectNextHigherInStack(nameOfStackUp);">
+		<br><input type=button value="\/" onclick="selectNextLowerInStack(nameOfStackUp);">
+</td></tr><tr id="tdText"><td>
+		<input type=text>
+	</td><td>
+		<input type="button" value="FLIP" onclick="var temp = nameOfStackUp; nameOfStackUp = nameOfStackDown; nameOfStackDown = temp; refresh();">
+</td></tr><tr id="tdStackDown"><td>
+		<div id='downStackPath' style="background-color:#4488aa">..downStackPath..</div>
+		<div id='downStackSelected' style="background-color:#00aaee">..downStackSelected..</div>
+		<div id='downStackGhost' style="background-color:#336688">..downStackGhost..</div>
+		<div id='downMid' style="background-color:#00dd88">..downMid..</div>
+	</td><td>
+		<input type=button value="/\" onclick="selectNextLowerInStack(nameOfStackDown);">
+		<br><input type=button value="\/" onclick="selectNextHigherInStack(nameOfStackDown);">
+</td></tr><tr id="tdPrilistDown"><td>
+		<div id='downPrilist' style="background-color:#ffffff;overflow-y:scroll;height:150px;width:100px">..downPrilist..</div>
+	</td><td>
+		<input type=button value="/\">
+		<br><input type=button value="/\">
+		<br><input type=button value="\/">
+		<br><input type=button value="\/">
+</td></tr></table></body>
+</body></html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><body>
+<input type=button onclick="document.location.reload(true);" value="refresh page">
+<div id="theDiv" style="position:absolute">abc</div>
+<script>
+var time = function(){
+	return Date.now()*.001;
+};
+var theDiv = document.getElementById("theDiv");
+var gyroAngles = [0,0,0];
+var minGyroAngles = [0,0,0];
+var maxGyroAngles = [0,0,0];
+var gyroAsNormedFraction = [0,0,0];
+var gyroRangeDecay = .5;
+var gyroLastEventWhen = time();
+var onChangeGyroAngles = function(){
+	//theDiv.innerHTML = "Time: "+time();
+	var pageWidth = window.outerWidth;
+	var pageHeight = window.outerHeight;
+	//theDiv.style.left = Math.round(-500 + 340*gyroAngles[0])+'px';
+	theDiv.style.left = Math.round(350)+'px';
+	theDiv.style.top = Math.round(850-500*gyroAngles[1])+'px';
+	//theDiv.style.left = Math.round(pageWidth*gyroAsNormedFraction[0])+'px';
+	//theDiv.style.top = Math.round(pageHeight*gyroAsNormedFraction[1])+'px';
+};
+window.onload = function(){
+	theDiv.innerHTML = "xx: "+time();
+	theDiv.innerHTML += "x";
+	if(window.DeviceOrientationEvent){
+		var gyroListener = function(e){
+			try{
+				var toRadians = 2*Math.PI/360;
+				gyroAngles[0] = e.alpha*toRadians;
+				gyroAngles[1] = e.beta*toRadians;
+				gyroAngles[2] = e.gamma*toRadians;
+				/*var now = time();
+				var dt = Math.max(0,Math.min(now-gyroLastEventWhen,.5));
+				var decay = gyroRangeDecay*dt;
+				for(var i=0; i<3; i++){
+					minGyroAngles[i] = Math.min(gyroAngles[i], minGyroAngles)
+					maxGyroAngles[i] = maxGyroAngles[i]*(1-decay) + decay*Math.max(maxGyroAngles[i], gyroAngles[i]);
+					var range = Math.max(.001, maxGyroAngles[i]-minGyroAngles[i]);
+					gyroAsNormedFraction[i] = (gyroAngles[i]-minGyroAngles[i])/range;
+				}*/
+				onChangeGyroAngles();
+			}catch(ex){
+				alert("err"+ex);
+			}
+		};
+		window.addEventListener('deviceorientation', gyroListener, false);
+	}else{
+		theDiv.innerHTML = "No window.DeviceOrientationEvent";
+	}
+};
+</script>
+</body></html>

@@ -22,3 +22,5 @@ The .json files are smaller and easier to read and are the newest of each name.
 
 Listweb is opensource GNU GPL 2+
 To get the source code, unzip this jar file which you doubleclicked.
+
+(no relation to Listweb Comunicação & TI)

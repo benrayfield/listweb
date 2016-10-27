@@ -14,8 +14,8 @@ The + button adds a name, and - removes it.
 
 You can search by parts of words like "ord sea" finds names containing both "search" and "words"
 
-No save button. All changes are automaticly saved every 15 minutes
-and copied to version history every 1 minute, when changes exist.
+No save button. All changes are automaticly saved every 1 minute
+and copied to version history every 15 minutes, when changes exist.
 To get those versions, like if you delete or change by accident,
 they're the .jsonperline files in "+Root.jsonVarDir
 The .json files are smaller and easier to read and are the newest of each name.

@@ -6,6 +6,11 @@ versioned mindmap of dragAndDroppable named lists of lists... in a web for peopl
   <img src="https://raw.githubusercontent.com/benrayfield/listweb/master/images/listweb_0.1_example_dreams.png"/>
 </nobr>
 
+I've been using my web of named lists (each with an area to copy/paste or write text) http://github.com/benrayfield/listweb for a few years. The version there is stable enough but I'm redesigning the one I'm using cuz it got so big and I added a datetime column on the left to every item (when to look at it next, then usually click once to add a month week day hour 5minutes or combinations), usually drag and drop a bunch of them in about 30 seconds. The 2 sides up and down view the same huge list of all these notes, filenames, urls, lots of stuff I organize here. I have about 45000 names (empty lists) and a few thousand of them are lists, and I plan to use it, with various features added as needed, without starting over in an empty one ever, for the rest of my life I'm estimating I'll have about a million names in it. I'm upgrading the search.
+
+Ordinary mindmaps just dont scale for this many tiny thoughts connecting to eachother.
+
+
 This is a web. Anything can connect to anything.
 If x is in y's list, y is in x's list,
 but they can be different orders (try by priority or time).

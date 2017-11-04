@@ -76,7 +76,6 @@ public class MigrationFromOlderKindOfMindmapFiles{
 			"c:/q25x/humanainet/tool/benfrayfieldTool.humanainet",
 			"c:/q25x/humanainet/selfmodhtml/benfrayfieldSelfmodhtml.humanainet",
 			"c:/q25x/humanainet/pow/benfrayfieldPow.humanainet",
-			"c:/q25x/humanainet/life3d/benfrayfieldLife3d.humanainet",
 			"c:/q25x/humanainet/mmgpaint/benfrayfieldMmgpaint.humanainet",
 			"c:/q25x/humanainet/niche/benfrayfieldNiche.humanainet",
 			"c:/q25x/humanainet/onion/benfrayfieldOnion.humanainet",
